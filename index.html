@@ -2,11 +2,12 @@
 <html>
 <head>
   <title>Login Page</title>
-  
+  <link rel="stylesheet" href="index.css">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
-  <script src="https://cdn.auth0.com/js/auth0/9.18/auth0.min.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://apis.google.com/js/api.js"></script>
 </head>
 <body>
   <div class="background">
@@ -21,71 +22,7 @@
       <button type="submit" id="login-btn">Login</button>
     </form>
   <button onclick="location.href='/new_user.html'" id="signup">Sign Up</button>
- 
-  <script>
-    // chnaging the type of the input in password  to show the password in text form 
-    const loginBtn = document.getElementById("login-btn");
-    const usernameInput = document.getElementById('username-input');
-    const passwordInput = document.getElementById('password-input');
-    // login button to send the code to the server 
-    loginBtn.addEventListener('click', async (event) => {
-      event.preventDefault(); // to prevent reload to of the page
-      console.log("login  click")//to check if code is working 
-      const username = usernameInput.value;
-      const password = passwordInput.value;
-      const response = await fetch('/api/login', {
-        method: 'POST', // use to submit the data on server 
-        headers: {
-          'Content-Type': 'application/json' // type of contain we want to send to the server
-        },
-        body: JSON.stringify({ username, password })
-      });
-
-      const data = await response.json(); // get the respone in of data in js form 
-
-      if (response.ok) {
-        // Save JWT token to local storage
-        localStorage.setItem('token', data.token); // if response is ok then it save the data to token in local stroage 
-        
-        // Redirect to dashboard
-        window.location.href = '/dashboard.html'; // then navigate to the dashboard.html
-      } else {
-        // Display error message
-        alert(data.message); // else show the message (error message )
-      }
-    });
-    // google code for Oauth
-    window.addEventListener('DOMContentLoaded', () => {
-    const auth0 = new auth0.WebAuth({
-            domain: 'your-auth0-domain.auth0.com',
-            client_id: 'your-client-id',
-            redirect_uri: 'http://localhost:3000',
-            audience: 'https://your-api.com',
-            scope: 'openid profile email',
-        });
-
-        function login() {
-            auth0.loginWithRedirect();
-        }
-
-        function logout() {
-            auth0.logout();
-        }
-
-        async function handleRedirectCallback() {
-            await auth0.handleRedirectCallback();
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-
-        async function getUser() {
-            const accessToken = await auth0.getTokenSilently();
-            const user = await auth0.getUser({ audience: 'https://your-api.com', scope: 'openid profile email' });
-            console.log(user);
-            return user;
-        }
-      });
-      //google login 
-
-  </script>
+ <div id="buttonDiv"></div>
+  <script src="login.js" ></script>
 </body>
 </html>

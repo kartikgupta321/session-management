@@ -59,6 +59,20 @@ app.get('/user.css', (req, res) => {
 app.get('/script.js', (req, res) => {
   res.sendFile(__dirname + '/script.js');
 });
+app.get('/dashboard.css', (req, res) => {
+  res.sendFile(__dirname + '/dashboard.css');
+});
+app.get('/dashboard.html', (req, res) => {
+  res.sendFile(__dirname + '/dashboard.html');
+});
+app.get('/new_user.html', (req, res) => {
+  res.sendFile(__dirname + '/new_user.html');
+});
+// Serve the new_user.html file when the URL "/new_user.html" is accessed
+app.get('/login.js', (req, res) => {
+  res.sendFile(__dirname + '/login.js');
+});
+
 // Define login route
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
@@ -81,10 +95,7 @@ app.get('/index.html', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-// Serve the new_user.html file when the URL "/new_user.html" is accessed
-app.get('/new_user.html', (req, res) => {
-  res.sendFile(__dirname + '/new_user.html');
-});
+
 app.post('/api/signup', async (req, res) => {
   const { name, email, username, password } = req.body;
 
@@ -124,10 +135,6 @@ function authenticateToken(req, res, next) {
     next();
   });
 }
-
-app.get('/dashboard.html', (req, res) => {
-  res.sendFile(__dirname + '/dashboard.html');
-});
 
 // define the dashboard route 
 app.get('/dashboard', authenticateToken, async (req, res) => {
@@ -196,9 +203,6 @@ function authenticateToken(req, res, next) {
     next();
   });
 }
-
-
-
 
 // Start server
 app.listen(3002, () => {

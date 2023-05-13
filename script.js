@@ -49,39 +49,37 @@ form.addEventListener('submit', async (event) => {
 });
   // google login 
 
-  function handleGoogleAuthSuccess(idToken) {
+function handleGoogleAuthSuccess(idToken) {
     // Send the ID token to the backend
     console.log("working the api");
     fetch('/api/google', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ token: idToken })
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ token: idToken })
     })
     .then(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error('Network response was not ok');
-      }
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw new Error('Network response was not ok');
+        }
     })
     .then(data => {
-      console.log(data.message);
-      if (data.token) {
-        alert(data.message);
-        window.location.href = '/dashboard.html';
-      } else {
-        alert('There was a problem with the authentication');
-      }
+        console.log(data.message);
+        if (data.token) {
+            alert(data.message);
+            window.location.href = '/dashboard.html';
+        } else {
+            alert('There was a problem with the authentication');
+        }
     })
     .catch(error => {
-      console.error('There was a problem with the fetch operation:', error);
-      alert('There was a problem with the fetch operation');
+        console.error('There was a problem with the fetch operation:', error);
+        alert('There was a problem with the fetch operation');
     });
-  }
-  
-  
+}
 
 function handleCredentialResponse(response) {
     var token = response.credential
