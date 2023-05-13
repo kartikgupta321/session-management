@@ -2,7 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const jwt_decode =require('jwt-decode')
+const googleAuth = require('google-auth-library');
 const app = express();
 app.use(express.static('public'));
 app.use(express.json());
@@ -28,7 +29,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  password: { type: String, required: false },
   isAdmin: { type: Boolean, default: false }
 });
 
@@ -37,18 +38,27 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 
 // Define JWT secret key
-const JWT_SECRET = 'mysecretkey';
-
-// Define admin user
+const JWT_SECRET = 'mysecretkey';  //mysecretkey is a string that is being used as a secret key to encode and decode JSON Web Tokens (JWTs) in this particular code snippet.
 
 
+// configure the Google authentication strategy
+
+
+// define the Google authentication routes
 
 // intial to login page 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
-
-
+app.get('/index.css', (req, res) => {
+  res.sendFile(__dirname + '/index.css');
+});
+app.get('/user.css', (req, res) => {
+  res.sendFile(__dirname + '/user.css');
+});
+app.get('/script.js', (req, res) => {
+  res.sendFile(__dirname + '/script.js');
+});
 // Define login route
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
@@ -135,9 +145,8 @@ app.get('/dashboard', authenticateToken, async (req, res) => {
     const user = await User.findById(decodedToken.id);
     if (user.isAdmin) {
       console.log('User is an admin'); // Log admin status
-
       // Fetch all user details from the database
-      const allUsers = await User.find({}, { name: 1, email: 1, _id: 0 });
+      const allUsers = await User.find({}, { name: 1, email: 1, username: 1, _id: 0 });
       console.log('All users:', allUsers); // Log all user data
 
       // Send all user details as a response
@@ -153,6 +162,40 @@ app.get('/dashboard', authenticateToken, async (req, res) => {
     res.status(500).send('Internal server error');
   }
 });
+app.post('/api/google', async (req, res) => {
+  console.log("working the api");
+  const token = req.body.token;
+  console.log(token);
+  const decoded = jwt_decode(token);
+  console.log(decoded);
+  const email = decoded.email;
+  const name = decoded.name;
+  const username = decoded.given_name;
+  console.log(email, name, username);
+  let user = await User.findOne({ email });
+  if (!user) {
+    console.log("creating new user");
+    user = new User({
+      name,
+      email,
+      username,
+    });
+    await user.save();
+  }
+  const jwtToken = jwt.sign({ id: user._id }, JWT_SECRET);
+  res.json({ message: 'User authenticated', token: jwtToken });
+});
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (token == null) return res.sendStatus(401);
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
 
 
 

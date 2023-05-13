@@ -9,33 +9,62 @@
     <script>
       // Retrieve the dashboard content from the server using AJAX
       function loadDashboardContent() {
-  fetch("/dashboard", {
-    headers: {
-      "Authorization": "Bearer " + localStorage.getItem("token")
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    console.log(data);
+        fetch("/dashboard", {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
 
-    // If the data is an array, display all users' data
-    if (Array.isArray(data)) {
-      var dashboardContent = "<h2>All Users:</h2><ul>";
-      data.forEach(user => {
-        dashboardContent += "<li>Name: " + user.name + ", Email: " + user.email + "</li>";
-      });
-      dashboardContent += "</ul>";
-    } else { // Otherwise, display the logged-in user's data
-      var dashboardContent = "<h2>Your Profile:</h2><ul><li>Name: " + data.name + "<br></li><li>Email: " + data.email + "</li></ul>";
-    }
+            // Generate HTML table based on the data received
+            var dashboardContent = "<table><thead><tr>";
+            if (Array.isArray(data)) {
+              dashboardContent +=
+                "<th>Name</th><th>Username</th><th>Email</th>";
+            } else {
+              dashboardContent += "<th>Property</th><th>Value</th>";
+            }
+            dashboardContent += "</tr></thead><tbody>";
 
-    document.getElementById("dashboard-content").innerHTML = dashboardContent;
-  })
-  .catch(error => {
-    console.error(error);
-  });
-}
+            if (Array.isArray(data)) {
+              data.forEach((user) => {
+                dashboardContent +=
+                  "<tr><td>" +
+                  user.name +
+                  "</td><td>" +
+                  user.username +
+                  "</td><td>" +
+                  user.email +
+                  "</td></tr>";
+              });
+            } else {
+              Object.keys(data).forEach((key) => {
+                dashboardContent +=
+                  "<tr><td>" +
+                  key +
+                  "</td><td>" +
+                  data[key] +
+                  "</td></tr>";
+              });
+            }
 
+            dashboardContent += "</tbody></table>";
+
+            // Set the generated HTML as the content of the dashboard div
+            document.getElementById("dashboard-content").innerHTML =
+              dashboardContent;
+          })
+          .catch((error) => {
+            console.log(error);
+
+            // Redirect the user to the login page if there is an error
+          
+          });
+      }
+      var currentTabUrl = window.location.href;
+      var dashboardUrl = "https://localhost:/dashboard";
     </script>
   </body>
 </html>
